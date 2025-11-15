@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   camiones-db:
     image: postgres:16-alpine
@@ -12,6 +10,28 @@ services:
       - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tpi_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ms-camiones:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ms_camiones
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://camiones-db:5432/camionesdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      camiones-db:
+        condition: service_healthy
     networks:
       - tpi_network
 
