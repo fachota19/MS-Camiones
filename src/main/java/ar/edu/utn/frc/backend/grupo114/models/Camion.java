@@ -1,52 +1,56 @@
 package ar.edu.utn.frc.backend.grupo114.models;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Table;
-import jakarta.persistence.GenerationType;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "camiones")
 public class Camion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "patente", nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 10)
     private String patente;
 
-    @Column(name = "disponible", nullable = false)
-    private Boolean disponible;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EstadoCamion estado;  // NUEVO
 
     @Column(name = "consumo_combustible_por_km", nullable = false)
-    private Double consumoCombustiblePorKm;
+    private BigDecimal consumoCombustiblePorKm; // CAMBIO A BigDecimal
 
     @Column(name = "costo_por_km", nullable = false)
-    private Double costoPorKm;
+    private BigDecimal costoPorKm; // CAMBIO A BigDecimal
 
     @Column(name = "transportista_id", nullable = false)
     private Long transportistaId;
 
     @ManyToOne
-    @JoinColumn(name = "tipo_camion_id")
+    @JoinColumn(name = "tipo_camion_id", nullable = false)
     private TipoCamion tipoCamion;
 
-    protected Camion() {
-    }
-    
-    public Camion(String patente, Boolean disponible, Double consumoCombustiblePorKm, Double costoPorKm, Long transportistaId, TipoCamion tipoCamion) {
+    public Camion() {}
+
+    public Camion(
+            String patente,
+            EstadoCamion estado,
+            BigDecimal consumoCombustiblePorKm,
+            BigDecimal costoPorKm,
+            Long transportistaId,
+            TipoCamion tipoCamion
+    ) {
         this.patente = patente;
-        this.disponible = disponible;
+        this.estado = estado;
         this.consumoCombustiblePorKm = consumoCombustiblePorKm;
         this.costoPorKm = costoPorKm;
         this.transportistaId = transportistaId;
         this.tipoCamion = tipoCamion;
     }
 
-    // Getters y Setters
+    // ---------- GETTERS & SETTERS ----------
+
     public Long getId() {
         return id;
     }
@@ -63,27 +67,27 @@ public class Camion {
         this.patente = patente;
     }
 
-    public Boolean getDisponible() {
-        return disponible;
+    public EstadoCamion getEstado() {
+        return estado;
     }
 
-    public void setDisponible(Boolean disponible) {
-        this.disponible = disponible;
+    public void setEstado(EstadoCamion estado) {
+        this.estado = estado;
     }
 
-    public Double getConsumoCombustiblePorKm() {
+    public BigDecimal getConsumoCombustiblePorKm() {
         return consumoCombustiblePorKm;
     }
 
-    public void setConsumoCombustiblePorKm(Double consumoCombustiblePorKm) {
+    public void setConsumoCombustiblePorKm(BigDecimal consumoCombustiblePorKm) {
         this.consumoCombustiblePorKm = consumoCombustiblePorKm;
     }
 
-    public Double getCostoPorKm() {
+    public BigDecimal getCostoPorKm() {
         return costoPorKm;
     }
 
-    public void setCostoPorKm(Double costoPorKm) {
+    public void setCostoPorKm(BigDecimal costoPorKm) {
         this.costoPorKm = costoPorKm;
     }
 
@@ -102,5 +106,4 @@ public class Camion {
     public void setTipoCamion(TipoCamion tipoCamion) {
         this.tipoCamion = tipoCamion;
     }
-
 }

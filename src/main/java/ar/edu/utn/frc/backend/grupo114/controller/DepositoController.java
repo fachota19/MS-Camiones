@@ -26,13 +26,21 @@ public class DepositoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DepositoDTO> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(depositoService.obtenerPorId(id));
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(depositoService.obtenerPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public ResponseEntity<DepositoDTO> crear(@Valid @RequestBody CreateDepositoDTO createDepositoDTO) {
-        DepositoDTO nuevoDeposito = depositoService.crear(createDepositoDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDeposito);
+    public ResponseEntity<?> crear(@Valid @RequestBody CreateDepositoDTO createDepositoDTO) {
+        try {
+            DepositoDTO nuevoDeposito = depositoService.crear(createDepositoDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDeposito);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

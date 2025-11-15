@@ -1,0 +1,25 @@
+Accesos:
+
+📌 Microservicio en:
+http://localhost:8081
+
+📌 Swagger en:
+http://localhost:8081/swagger-ui/index.html
+
+📌 pgAdmin en:
+http://localhost:5050
+
+User: admin@admin.com
+Pass: admin
+
+📌 Conexión DB en pgAdmin:
+
+Host: camiones-db
+
+Port: 5432
+
+DB: camionesdb
+
+User: postgres
+
+Pass: postgres

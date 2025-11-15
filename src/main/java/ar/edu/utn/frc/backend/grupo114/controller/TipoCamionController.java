@@ -26,13 +26,21 @@ public class TipoCamionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TipoCamionDTO> obtenerPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(tipoCamionService.obtenerPorId(id));
+    public ResponseEntity<?> obtenerPorId(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(tipoCamionService.obtenerPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PostMapping
-    public ResponseEntity<TipoCamionDTO> crear(@Valid @RequestBody CreateTipoCamionDTO createTipoCamionDTO) {
-        TipoCamionDTO nuevoTipo = tipoCamionService.crear(createTipoCamionDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoTipo);
+    public ResponseEntity<?> crear(@Valid @RequestBody CreateTipoCamionDTO createTipoCamionDTO) {
+        try {
+            TipoCamionDTO nuevoTipo = tipoCamionService.crear(createTipoCamionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoTipo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

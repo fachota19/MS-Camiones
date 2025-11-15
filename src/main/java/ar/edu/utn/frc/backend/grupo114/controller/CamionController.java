@@ -32,14 +32,19 @@ public class CamionController {
 
     @GetMapping("/disponibles")
     public ResponseEntity<List<CamionDTO>> listarDisponibles(
-            @RequestParam Double peso, 
-            @RequestParam Double volumen) {
+            @RequestParam Double peso,
+            @RequestParam Double volumen
+    ) {
         return ResponseEntity.ok(camionService.listarDisponibles(peso, volumen));
     }
 
     @PostMapping
-    public ResponseEntity<CamionDTO> crear(@Valid @RequestBody CreateCamionDTO createCamionDTO) {
-        CamionDTO nuevoCamion = camionService.crear(createCamionDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCamion);
+    public ResponseEntity<?> crear(@Valid @RequestBody CreateCamionDTO createCamionDTO) {
+        try {
+            CamionDTO nuevoCamion = camionService.crear(createCamionDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoCamion);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

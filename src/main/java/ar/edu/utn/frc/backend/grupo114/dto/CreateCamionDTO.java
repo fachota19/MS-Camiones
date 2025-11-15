@@ -11,6 +11,9 @@ public class CreateCamionDTO {
     @Size(max = 10, message = "La patente no puede tener más de 10 caracteres.")
     private String patente;
 
+    @NotNull(message = "El estado del camión es obligatorio.")
+    private String estado; // ENUM enviado como texto: DISPONIBLE, EN_RUTA, etc.
+
     @NotNull(message = "El id del tipo de camión es obligatorio.")
     private Long tipoCamionId;
 
@@ -25,44 +28,23 @@ public class CreateCamionDTO {
     @NotNull(message = "El id del transportista es obligatorio.")
     private Long transportistaId;
 
+    // -------- Getters y Setters --------
 
-    public String getPatente() {
-        return patente;
-    }
+    public String getPatente() { return patente; }
+    public void setPatente(String patente) { this.patente = patente; }
 
-    public void setPatente(String patente) {
-        this.patente = patente;
-    }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 
-    public Long getTipoCamionId() {
-        return tipoCamionId;
-    }
+    public Long getTipoCamionId() { return tipoCamionId; }
+    public void setTipoCamionId(Long tipoCamionId) { this.tipoCamionId = tipoCamionId; }
 
-    public void setTipoCamionId(Long tipoCamionId) {
-        this.tipoCamionId = tipoCamionId;
-    }
+    public Double getConsumoCombustiblePorKm() { return consumoCombustiblePorKm; }
+    public void setConsumoCombustiblePorKm(Double consumoCombustiblePorKm) { this.consumoCombustiblePorKm = consumoCombustiblePorKm; }
 
-    public Double getConsumoCombustiblePorKm() {
-        return consumoCombustiblePorKm;
-    }
+    public Double getCostoPorKm() { return costoPorKm; }
+    public void setCostoPorKm(Double costoPorKm) { this.costoPorKm = costoPorKm; }
 
-    public void setConsumoCombustiblePorKm(Double consumoCombustiblePorKm) {
-        this.consumoCombustiblePorKm = consumoCombustiblePorKm;
-    }
-
-    public Double getCostoPorKm() {
-        return costoPorKm;
-    }
-
-    public void setCostoPorKm(Double costoPorKm) {
-        this.costoPorKm = costoPorKm;
-    }
-
-    public Long getTransportistaId() {
-        return transportistaId;
-    }
-
-    public void setTransportistaId(Long transportistaId) {
-        this.transportistaId = transportistaId;
-    }
+    public Long getTransportistaId() { return transportistaId; }
+    public void setTransportistaId(Long transportistaId) { this.transportistaId = transportistaId; }
 }

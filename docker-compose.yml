@@ -1,41 +1,36 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # Servicio de Base de Datos para Camiones
   camiones-db:
     image: postgres:16-alpine
-    container_name: ms_camiones_db
+    container_name: camiones_db
     environment:
-      POSTGRES_DB: camionesdb # <-- CAMBIADO: Coincide con application.properties
+      POSTGRES_DB: camionesdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5435:5432" # <-- CAMBIADO: Puerto del Host 5435 (de tu README)
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - tpi_network # Agregado a la red
+      - tpi_network
 
-  # --- AGREGADO: Servicio pgAdmin ---
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin_tpi
+    container_name: pgadmin_camiones
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com # (Email de tu README)
-      PGADMIN_DEFAULT_PASSWORD: admin      # (Pass de tu README)
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "5050:80" # (Puerto 5050 de tu README)
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - tpi_network # Agregado a la red
+      - "5050:80"
     depends_on:
-      - camiones-db # Espera a que la BDD esté lista
+      - camiones-db
+    networks:
+      - tpi_network
 
 volumes:
   postgres_data:
-  pgadmin_data: # Volumen para pgAdmin
 
 networks:
-  tpi_network: # Red compartida
+  tpi_network:
     driver: bridge
