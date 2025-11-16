@@ -1,4 +1,10 @@
+version: '3.9'
+
 services:
+
+  # ===========================
+  # 📌 Base de datos Camiones
+  # ===========================
   camiones-db:
     image: postgres:16-alpine
     container_name: camiones_db
@@ -18,23 +24,69 @@ services:
       timeout: 5s
       retries: 5
 
+
+  # ===========================
+  # 📌 OSRM (motor de rutas)
+  # ===========================
+  osrm:
+    image: ghcr.io/project-osrm/osrm-backend:latest
+    container_name: osrm
+    ports:
+      - "5000:5000"
+    volumes:
+        - "C:/osrm-data:/data"
+    command: >
+      osrm-routed /data/argentina-latest.osrm
+    networks:
+      - tpi_network
+
+
+  # ===========================
+  # 📌 GEOAPI (servicio externo)
+  # ===========================
+  geoapi:
+    build:
+      context: ../../geoapi           # ⬅️ AJUSTÁ ESTA RUTA
+      dockerfile: Dockerfile
+    container_name: geoapi
+    ports:
+      - "8080:8080"                # Spring Boot usa 8080 inside
+    environment:
+      SERVER_PORT: 8080
+      OSRM_URL: http://osrm:5000   # ⬅️ GEOAPI llama a OSRM
+    depends_on:
+      - osrm
+    networks:
+      - tpi_network
+
+
+  # ===========================
+  # 📌 MS CAMIONES
+  # ===========================
   ms-camiones:
     build:
-      context: .
+      context: .                   # ⬅️ este compose está dentro del MS Camiones
       dockerfile: Dockerfile
     container_name: ms_camiones
     ports:
-      - "8081:8081"
+      - "8083:8081"                # 8081 inside → 8083 en host
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://camiones-db:5432/camionesdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      GEOAPI_URL: http://geoapi:8080     # ⬅️ MS CAMIONES llama a GEOAPI
     depends_on:
       camiones-db:
         condition: service_healthy
+      geoapi:
+        condition: service_started
     networks:
       - tpi_network
 
+
+  # ===========================
+  # 📌 PGADMIN
+  # ===========================
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin_camiones
@@ -48,9 +100,16 @@ services:
     networks:
       - tpi_network
 
+
+# ===========================
+# 📌 Volúmenes persistentes
+# ===========================
 volumes:
   postgres_data:
 
+# ===========================
+# 📌 Red para todos los servicios
+# ===========================
 networks:
   tpi_network:
     driver: bridge

@@ -47,4 +47,25 @@ public class CamionController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // -------------------------------------------------------
+    // NUEVO ENDPOINT: calcular distancia usando GEOAPI
+    // -------------------------------------------------------
+    @GetMapping("/distancia")
+    public ResponseEntity<?> calcularDistancia(
+            @RequestParam double origenLat,
+            @RequestParam double origenLon,
+            @RequestParam double destinoLat,
+            @RequestParam double destinoLon
+    ) {
+        try {
+            return ResponseEntity.ok(
+                    camionService.calcularRuta(origenLat, origenLon, destinoLat, destinoLon)
+            );
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_GATEWAY)
+                    .body("Error al consultar GeoAPI: " + e.getMessage());
+        }
+    }
 }

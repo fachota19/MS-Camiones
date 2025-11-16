@@ -16,10 +16,10 @@ public class Camion {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private EstadoCamion estado;  // NUEVO
+    private EstadoCamion estado; 
 
     @Column(name = "consumo_combustible_por_km", nullable = false)
-    private BigDecimal consumoCombustiblePorKm; // CAMBIO A BigDecimal
+    private BigDecimal consumoCombustiblePorKm; 
 
     @Column(name = "costo_por_km", nullable = false)
     private BigDecimal costoPorKm; // CAMBIO A BigDecimal
