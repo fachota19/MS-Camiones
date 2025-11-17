@@ -2,9 +2,6 @@ version: '3.9'
 
 services:
 
-  # ===========================
-  # 📌 Base de datos Camiones
-  # ===========================
   camiones-db:
     image: postgres:16-alpine
     container_name: camiones_db
@@ -25,56 +22,54 @@ services:
       retries: 5
 
 
-  # ===========================
-  # 📌 OSRM (motor de rutas)
-  # ===========================
   osrm:
     image: ghcr.io/project-osrm/osrm-backend:latest
     container_name: osrm
     ports:
       - "5000:5000"
     volumes:
-        - "C:/osrm-data:/data"
+      - "C:/osrm-data:/data"
     command: >
       osrm-routed /data/argentina-latest.osrm
     networks:
       - tpi_network
 
 
-  # ===========================
-  # 📌 GEOAPI (servicio externo)
-  # ===========================
   geoapi:
     build:
-      context: ../../geoapi           # ⬅️ AJUSTÁ ESTA RUTA
+      context: ../../geoapi
       dockerfile: Dockerfile
     container_name: geoapi
     ports:
-      - "8080:8080"                # Spring Boot usa 8080 inside
+      - "8080:8080"
     environment:
       SERVER_PORT: 8080
-      OSRM_URL: http://osrm:5000   # ⬅️ GEOAPI llama a OSRM
+      OSRM_URL: http://osrm:5000
     depends_on:
       - osrm
     networks:
       - tpi_network
 
 
-  # ===========================
-  # 📌 MS CAMIONES
-  # ===========================
   ms-camiones:
     build:
-      context: .                   # ⬅️ este compose está dentro del MS Camiones
+      context: .
       dockerfile: Dockerfile
     container_name: ms_camiones
     ports:
-      - "8083:8081"                # 8081 inside → 8083 en host
+      - "8083:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://camiones-db:5432/camionesdb
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      GEOAPI_URL: http://geoapi:8080     # ⬅️ MS CAMIONES llama a GEOAPI
+      
+      # 🔐 Keycloak
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:8081/realms/tpi-backend
+
+      # 🌍 GeoAPI → esto SOLUCIONA EL ERROR
+      GEOAPI_URL: http://geoapi:8080
+      geoapi.url: http://geoapi:8080   # ← si tu código usa ${geoapi.url}
+
     depends_on:
       camiones-db:
         condition: service_healthy
@@ -84,9 +79,6 @@ services:
       - tpi_network
 
 
-  # ===========================
-  # 📌 PGADMIN
-  # ===========================
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin_camiones
@@ -101,15 +93,9 @@ services:
       - tpi_network
 
 
-# ===========================
-# 📌 Volúmenes persistentes
-# ===========================
 volumes:
   postgres_data:
 
-# ===========================
-# 📌 Red para todos los servicios
-# ===========================
 networks:
   tpi_network:
     driver: bridge
