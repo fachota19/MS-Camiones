@@ -2,100 +2,154 @@ version: '3.9'
 
 services:
 
+  ####################################################
+  # 🟦 KEYCLOAK
+  ####################################################
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak/realms:/opt/keycloak/data/import
+    ports:
+      - "8081:8080"
+    networks:
+      - tpi-net
+
+  ####################################################
+  # 🟦 GATEWAY
+  ####################################################
+  api-gateway:
+    build: ./gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak
+      - ms-usuarios
+      - ms-solicitudes
+      - ms-tarifas
+      - ms-camiones
+    networks:
+      - tpi-net
+
+  ####################################################
+  # 🟦 USUARIOS + DB
+  ####################################################
+  usuarios-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: usuariosdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - tpi-net
+    volumes:
+      - usuarios_data:/var/lib/postgresql/data
+
+  ms-usuarios:
+    build: ./MS-Usuarios
+    depends_on:
+      - usuarios-db
+    networks:
+      - tpi-net
+
+  ####################################################
+  # 🟦 SOLICITUDES + DB
+  ####################################################
+  solicitudes-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: solicitudesdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - tpi-net
+    volumes:
+      - solicitudes_data:/var/lib/postgresql/data
+
+  ms-solicitudes:
+    build: ./MS-Solicitudes
+    depends_on:
+      - solicitudes-db
+    networks:
+      - tpi-net
+
+  ####################################################
+  # 🟦 TARIFAS + DB
+  ####################################################
+  tarifas-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tarifasdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    networks:
+      - tpi-net
+    volumes:
+      - tarifas_data:/var/lib/postgresql/data
+
+  ms-tarifas:
+    build: ./MS-Tarifas
+    depends_on:
+      - tarifas-db
+    networks:
+      - tpi-net
+
+  ####################################################
+  # 🟦 CAMIONES + DB
+  ####################################################
   camiones-db:
-    image: postgres:16-alpine
-    container_name: camiones_db
+    image: postgres:15
     environment:
       POSTGRES_DB: camionesdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5435:5432"
+      - "5436:5432"
+    networks:
+      - tpi-net
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - tpi_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-
-  osrm:
-    image: ghcr.io/project-osrm/osrm-backend:latest
-    container_name: osrm
-    ports:
-      - "5000:5000"
-    volumes:
-      - "C:/osrm-data:/data"
-    command: >
-      osrm-routed /data/argentina-latest.osrm
-    networks:
-      - tpi_network
-
-
-  geoapi:
-    build:
-      context: ../../geoapi
-      dockerfile: Dockerfile
-    container_name: geoapi
-    ports:
-      - "8080:8080"
-    environment:
-      SERVER_PORT: 8080
-      OSRM_URL: http://osrm:5000
-    depends_on:
-      - osrm
-    networks:
-      - tpi_network
-
+      - camiones_data:/var/lib/postgresql/data
 
   ms-camiones:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: ms_camiones
-    ports:
-      - "8083:8081"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://camiones-db:5432/camionesdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      
-      # 🔐 Keycloak
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://host.docker.internal:8081/realms/tpi-backend
-
-      # 🌍 GeoAPI → esto SOLUCIONA EL ERROR
-      GEOAPI_URL: http://geoapi:8080
-      geoapi.url: http://geoapi:8080   # ← si tu código usa ${geoapi.url}
-
-    depends_on:
-      camiones-db:
-        condition: service_healthy
-      geoapi:
-        condition: service_started
-    networks:
-      - tpi_network
-
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_camiones
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
+    build: ./MS-Camiones
     depends_on:
       - camiones-db
     networks:
-      - tpi_network
+      - tpi-net
 
+  ####################################################
+  # 🎨 FRONTEND
+  ####################################################
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    networks:
+      - tpi-net
+    depends_on:
+      - api-gateway
+      - keycloak
+
+####################################################
+# NETWORKS & VOLUMES
+####################################################
+networks:
+  tpi-net:
+    driver: bridge
 
 volumes:
-  postgres_data:
-
-networks:
-  tpi_network:
-    driver: bridge
+  usuarios_data:
+  solicitudes_data:
+  tarifas_data:
+  camiones_data:

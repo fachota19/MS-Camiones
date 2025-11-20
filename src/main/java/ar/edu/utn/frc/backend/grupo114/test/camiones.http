@@ -1,0 +1,99 @@
+### ---------------------------------------------------------
+### 🟦 1) Obtener todos los camiones
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 2) Buscar camión por ID
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones/1
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 3) Crear un nuevo camión
+### ---------------------------------------------------------
+POST http://localhost:8080/api/camiones
+Content-Type: application/json
+Accept: application/json
+
+{
+  "patente": "AAA123",
+  "tipo": "SEMI",
+  "estado": "DISPONIBLE",
+  "capacidadKg": 12000,
+  "depositoId": 1
+}
+
+
+### ---------------------------------------------------------
+### 🟦 4) Actualizar un camión existente
+### ---------------------------------------------------------
+PUT http://localhost:8080/api/camiones/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "patente": "AAA123",
+  "tipo": "SEMI",
+  "estado": "EN_VIAJE",
+  "capacidadKg": 12000,
+  "depositoId": 1
+}
+
+
+### ---------------------------------------------------------
+### 🟦 5) Eliminar camión
+### ---------------------------------------------------------
+DELETE http://localhost:8080/api/camiones/1
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 6) Listar camiones por estado
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones/estado/DISPONIBLE
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 7) Listar camiones por tipo
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones/tipo/SEMI
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 8) Crear un depósito
+### ---------------------------------------------------------
+POST http://localhost:8080/api/camiones/depositos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nombre": "Depósito Central",
+  "direccion": "Av. Siempre Viva 742"
+}
+
+
+### ---------------------------------------------------------
+### 🟦 9) Listar depósitos
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones/depositos
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 10) Obtener depósito por ID
+### ---------------------------------------------------------
+GET http://localhost:8080/api/camiones/depositos/1
+Accept: application/json
+
+
+### ---------------------------------------------------------
+### 🟦 11) Asignar un camión a un depósito
+### ---------------------------------------------------------
+PUT http://localhost:8080/api/camiones/1/deposito/2
+Accept: application/json
