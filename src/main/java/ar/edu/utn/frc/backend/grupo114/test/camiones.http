@@ -1,99 +1,58 @@
-### ---------------------------------------------------------
-### 🟦 1) Obtener todos los camiones
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones
-Accept: application/json
+### ================================
+### 1) OBTENER TOKEN DESDE KEYCLOAK
+### ================================
+# Ejecutá esto, copiá el access_token del JSON de respuesta
 
+POST http://localhost:8080/realms/tpi-backend/protocol/openid-connect/token
+Content-Type: application/x-www-form-urlencoded
 
-### ---------------------------------------------------------
-### 🟦 2) Buscar camión por ID
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones/1
-Accept: application/json
+client_id=TU_CLIENT_ID_BACKEND
+&grant_type=password
+&username=TU_USUARIO
+&password=TU_PASSWORD
 
+###
 
-### ---------------------------------------------------------
-### 🟦 3) Crear un nuevo camión
-### ---------------------------------------------------------
-POST http://localhost:8080/api/camiones
+@baseUrl = http://localhost:8084
+# Pegá acá el token que te devolvió Keycloak (sin comillas)
+@token = PEGAR_ACA_EL_JWT
+
+### ================================
+### 2) LISTAR CAMIONES
+### ================================
+GET {{baseUrl}}/api/camiones
+Authorization: Bearer {{token}}
+
+###
+
+### 3) LISTAR CAMIONES DISPONIBLES
+GET {{baseUrl}}/api/camiones/disponibles?peso=1000&volumen=10
+Authorization: Bearer {{token}}
+
+###
+
+### 4) CREAR CAMIÓN
+POST {{baseUrl}}/api/camiones
+Authorization: Bearer {{token}}
 Content-Type: application/json
-Accept: application/json
 
 {
-  "patente": "AAA123",
-  "tipo": "SEMI",
+  "patente": "ABC123",
   "estado": "DISPONIBLE",
-  "capacidadKg": 12000,
-  "depositoId": 1
+  "consumoCombustiblePorKm": 0.3,
+  "costoPorKm": 150.0,
+  "transportistaId": 1,
+  "tipoCamionId": 1
 }
 
+###
 
-### ---------------------------------------------------------
-### 🟦 4) Actualizar un camión existente
-### ---------------------------------------------------------
-PUT http://localhost:8080/api/camiones/1
-Content-Type: application/json
-Accept: application/json
+### 5) LISTAR DEPÓSITOS
+GET {{baseUrl}}/api/depositos
+Authorization: Bearer {{token}}
 
-{
-  "patente": "AAA123",
-  "tipo": "SEMI",
-  "estado": "EN_VIAJE",
-  "capacidadKg": 12000,
-  "depositoId": 1
-}
+###
 
-
-### ---------------------------------------------------------
-### 🟦 5) Eliminar camión
-### ---------------------------------------------------------
-DELETE http://localhost:8080/api/camiones/1
-Accept: application/json
-
-
-### ---------------------------------------------------------
-### 🟦 6) Listar camiones por estado
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones/estado/DISPONIBLE
-Accept: application/json
-
-
-### ---------------------------------------------------------
-### 🟦 7) Listar camiones por tipo
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones/tipo/SEMI
-Accept: application/json
-
-
-### ---------------------------------------------------------
-### 🟦 8) Crear un depósito
-### ---------------------------------------------------------
-POST http://localhost:8080/api/camiones/depositos
-Content-Type: application/json
-Accept: application/json
-
-{
-  "nombre": "Depósito Central",
-  "direccion": "Av. Siempre Viva 742"
-}
-
-
-### ---------------------------------------------------------
-### 🟦 9) Listar depósitos
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones/depositos
-Accept: application/json
-
-
-### ---------------------------------------------------------
-### 🟦 10) Obtener depósito por ID
-### ---------------------------------------------------------
-GET http://localhost:8080/api/camiones/depositos/1
-Accept: application/json
-
-
-### ---------------------------------------------------------
-### 🟦 11) Asignar un camión a un depósito
-### ---------------------------------------------------------
-PUT http://localhost:8080/api/camiones/1/deposito/2
-Accept: application/json
+### 6) LISTAR TIPOS DE CAMIÓN
+GET {{baseUrl}}/api/tipos-camion
+Authorization: Bearer {{token}}

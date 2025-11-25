@@ -21,22 +21,6 @@ services:
       - tpi-net
 
   ####################################################
-  # 🟦 GATEWAY
-  ####################################################
-  api-gateway:
-    build: ./gateway
-    ports:
-      - "8080:8080"
-    depends_on:
-      - keycloak
-      - ms-usuarios
-      - ms-solicitudes
-      - ms-tarifas
-      - ms-camiones
-    networks:
-      - tpi-net
-
-  ####################################################
   # 🟦 USUARIOS + DB
   ####################################################
   usuarios-db:
@@ -127,19 +111,6 @@ services:
       - camiones-db
     networks:
       - tpi-net
-
-  ####################################################
-  # 🎨 FRONTEND
-  ####################################################
-  frontend:
-    build: ./frontend
-    ports:
-      - "5173:80"
-    networks:
-      - tpi-net
-    depends_on:
-      - api-gateway
-      - keycloak
 
 ####################################################
 # NETWORKS & VOLUMES
