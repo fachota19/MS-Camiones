@@ -2,6 +2,7 @@ package ar.edu.utn.frc.backend.grupo114.service.impl;
 
 import ar.edu.utn.frc.backend.grupo114.dto.CreateDepositoDTO;
 import ar.edu.utn.frc.backend.grupo114.dto.DepositoDTO;
+import ar.edu.utn.frc.backend.grupo114.dto.UpdateDepositoDTO;
 import ar.edu.utn.frc.backend.grupo114.models.Deposito;
 import ar.edu.utn.frc.backend.grupo114.repository.DepositoRepository;
 import ar.edu.utn.frc.backend.grupo114.service.DepositoService;
@@ -36,20 +37,31 @@ public class DepositoServiceImpl implements DepositoService {
     @Transactional(readOnly = true)
     public DepositoDTO obtenerPorId(Long id) {
         Deposito deposito = depositoRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Depósito no encontrado con ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Deposito no encontrado con ID: " + id));
         return modelMapper.map(deposito, DepositoDTO.class);
     }
 
     @Override
     @Transactional
     public DepositoDTO crear(CreateDepositoDTO createDepositoDTO) {
-        // Convertir DTO a Entidad
         Deposito deposito = modelMapper.map(createDepositoDTO, Deposito.class);
-        
-        // Guardar
         Deposito depositoGuardado = depositoRepository.save(deposito);
-        
-        // Devolver DTO
         return modelMapper.map(depositoGuardado, DepositoDTO.class);
+    }
+
+    @Override
+    @Transactional
+    public DepositoDTO actualizar(Long id, UpdateDepositoDTO dto) {
+        Deposito deposito = depositoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Deposito no encontrado con ID: " + id));
+
+        deposito.setNombre(dto.getNombre());
+        deposito.setDireccion(dto.getDireccion());
+        deposito.setLatitud(dto.getLatitud());
+        deposito.setLongitud(dto.getLongitud());
+        deposito.setCostoEstadiaDiario(dto.getCostoEstadiaDiario());
+
+        Deposito actualizado = depositoRepository.save(deposito);
+        return modelMapper.map(actualizado, DepositoDTO.class);
     }
 }

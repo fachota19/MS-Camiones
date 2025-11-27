@@ -2,6 +2,7 @@ package ar.edu.utn.frc.backend.grupo114.controller;
 
 import ar.edu.utn.frc.backend.grupo114.dto.CreateDepositoDTO;
 import ar.edu.utn.frc.backend.grupo114.dto.DepositoDTO;
+import ar.edu.utn.frc.backend.grupo114.dto.UpdateDepositoDTO;
 import ar.edu.utn.frc.backend.grupo114.service.DepositoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,16 @@ public class DepositoController {
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDeposito);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody UpdateDepositoDTO dto) {
+        try {
+            DepositoDTO actualizado = depositoService.actualizar(id, dto);
+            return ResponseEntity.ok(actualizado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }
