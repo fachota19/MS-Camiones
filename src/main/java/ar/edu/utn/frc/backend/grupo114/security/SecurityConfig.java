@@ -31,16 +31,10 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // Camiones ABM
-                .requestMatchers("/api/camiones/**").hasRole("OPERADOR")
+                .requestMatchers("/api/camiones/**").hasAuthority("OPERADOR")
+                .requestMatchers("/api/depositos/**").hasAuthority("OPERADOR")
+                .requestMatchers("/api/tipos-camion/**").hasAuthority("OPERADOR")
 
-                // Depósitos
-                .requestMatchers("/api/depositos/**").hasRole("OPERADOR")
-
-                // Tipos de camión
-                .requestMatchers("/api/tipos-camion/**").hasRole("OPERADOR")
-
-                // Swagger
                 .requestMatchers(
                         "/swagger-ui.html",
                         "/swagger-ui/**",
@@ -77,8 +71,8 @@ public class SecurityConfig {
             List<String> roles = (List<String>) realmAccess.get("roles");
 
             return roles.stream()
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r.toUpperCase()))
-                .collect(Collectors.toList());
+                    .map(r -> new SimpleGrantedAuthority(r.toUpperCase()))
+                    .collect(Collectors.toList());
         }
     }
 }
